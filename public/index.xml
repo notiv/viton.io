@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>notiv</title>
+    <link>http://notiv.gr/</link>
+    <description>Recent content on notiv</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 07 Sep 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://notiv.gr/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Pinscrapy</title>
+      <link>http://notiv.gr/post/2017-09-07-pinscrapy-a-crawler-that-scrapes-pinboard/</link>
+      <pubDate>Thu, 07 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2017-09-07-pinscrapy-a-crawler-that-scrapes-pinboard/</guid>
+      <description>For a while now I&amp;rsquo;ve been meaning to program a content recommender similar to the one described in this post by Dr. Bunsen. The idea is to parse the bookmarks of a Pinboard user and then use machine learning to recommend interesting content based on the bookmarks of other &amp;ldquo;similar&amp;rdquo; users.
+This post focuses on the first step, i.e. creating the data that will be fed to the machine learning algorithm by crawling a small part of Pinboard.</description>
+    </item>
+    
+    <item>
+      <title>Calculate the variance of a sample from the variances of its subsamples</title>
+      <link>http://notiv.gr/post/2016-03-12-calculate-variance-from-subsample-variances/</link>
+      <pubDate>Sat, 12 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2016-03-12-calculate-variance-from-subsample-variances/</guid>
+      <description>Calculating the mean of a sample from the means of its subsamples is pretty straightforward1.
+Calculating however the variance of a sample from the variances of its subsamples didn&#39;t seem straightforward to me. It looks like there is a formula that allows us to do that. Assuming we have \(g\) sub-samples, each with \(k_j\), \(j=1,...,g\) elements for a total of \(n=\sum k_j\) values, then:
+\[ Var(X_1,...,X_n) = \frac{1}{n-1}(\sum_{j=1}^{g} (k_j-1)Var_j + \sum_{j=1}^{g}k_j(\bar{X}_j-\bar{X})^2) \]</description>
+    </item>
+    
+    <item>
+      <title>Apache Spark Cluster with Kubernetes and Docker - Part 2</title>
+      <link>http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/</link>
+      <pubDate>Mon, 01 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/</guid>
+      <description>In the first part of this tutorial, we deployed a Spark Cluster on Google Compute Engine (GCE) and exposed a Zeppelin notebook service in order to provide access to the cluster and launch jobs via a notebook frontend.
+The problem with this configuration is that the notebooks are stored locally in the machine we create (specifically under &amp;ldquo;${ZEPPELIN_HOME}/notebook&amp;rdquo;) and are lost the moment we shut the service down. In this second part, we create a GCE persistent disk to persistently store the Zeppelin notebooks.</description>
+    </item>
+    
+    <item>
+      <title>Git - Sparse Checkout</title>
+      <link>http://notiv.gr/post/2015-12-30-github-sparse-checkout/</link>
+      <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2015-12-30-github-sparse-checkout/</guid>
+      <description>The other day I wanted to checkout only part of a github repository, to be more specific, the Spark example subfolder of the kubernetes github repository: tree/master/examples/spark. I followed the instructions in this Stackoverflow answer: Create the folder where the repository code will be stored: git init git remote add -f origin git://github.com/kubernetes/kubernetes.git  Set core.sparseCheckout to true: git config core.sparseCheckout true  and define which files should actually be checkout out: echo&amp;#34;examples/spark&amp;#34;&amp;gt; .</description>
+    </item>
+    
+    <item>
+      <title>Apache Spark Cluster with Kubernetes and Docker - Part 1</title>
+      <link>http://notiv.gr/post/2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1/</link>
+      <pubDate>Wed, 09 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1/</guid>
+      <description>If you&amp;rsquo;re into Data Science and Analytics, you&amp;rsquo;ve probably heard of Apache Spark. I&amp;rsquo;ve been playing with this framework on and off for a while and completed two very interesting MOOCs on Spark; recently I decided
+First things first Click this link and follow the instructions in the section &amp;ldquo;Before you begin&amp;rdquo;: Create a google account, enable billing1, install the gcloud command line interface (CLI) and install docker locally. kubectl should also be installed: gcloud components update kubectl</description>
+    </item>
+    
+  </channel>
+</rss>

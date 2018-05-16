@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Github on notiv</title>
+    <link>http://notiv.gr/tags/github/</link>
+    <description>Recent content in Github on notiv</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 30 Dec 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://notiv.gr/tags/github/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Git - Sparse Checkout</title>
+      <link>http://notiv.gr/post/2015-12-30-github-sparse-checkout/</link>
+      <pubDate>Wed, 30 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2015-12-30-github-sparse-checkout/</guid>
+      <description>The other day I wanted to checkout only part of a github repository, to be more specific, the Spark example subfolder of the kubernetes github repository: tree/master/examples/spark. I followed the instructions in this Stackoverflow answer: Create the folder where the repository code will be stored: git init git remote add -f origin git://github.com/kubernetes/kubernetes.git  Set core.sparseCheckout to true: git config core.sparseCheckout true  and define which files should actually be checkout out: echo&amp;#34;examples/spark&amp;#34;&amp;gt; .</description>
+    </item>
+    
+  </channel>
+</rss>

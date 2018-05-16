@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://notiv.gr/post/2017-09-07-pinscrapy-a-crawler-that-scrapes-pinboard/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/post/2016-03-12-calculate-variance-from-subsample-variances/</loc>
+    <lastmod>2016-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/post/2015-12-30-github-sparse-checkout/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/post/2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1/</loc>
+    <lastmod>2015-12-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/about/</loc>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/apache/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/categories/development/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/docker/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/git/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/github/</loc>
+    <lastmod>2015-12-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/kubernetes/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/notes/</loc>
+    <lastmod>2016-03-12T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/pinboard/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/post/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/python/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/categories/python/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/scrapy/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/spark/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/categories/spark/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/statistics/</loc>
+    <lastmod>2016-03-12T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/categories/statistics/</loc>
+    <lastmod>2016-03-12T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/variance/</loc>
+    <lastmod>2016-03-12T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/tags/zeppelin/</loc>
+    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://notiv.gr/</loc>
+    <lastmod>2017-09-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

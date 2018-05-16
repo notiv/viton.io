@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Zeppelin on notiv</title>
+    <link>http://notiv.gr/tags/zeppelin/</link>
+    <description>Recent content in Zeppelin on notiv</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 01 Feb 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://notiv.gr/tags/zeppelin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Apache Spark Cluster with Kubernetes and Docker - Part 2</title>
+      <link>http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/</link>
+      <pubDate>Mon, 01 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/</guid>
+      <description>In the first part of this tutorial, we deployed a Spark Cluster on Google Compute Engine (GCE) and exposed a Zeppelin notebook service in order to provide access to the cluster and launch jobs via a notebook frontend.
+The problem with this configuration is that the notebooks are stored locally in the machine we create (specifically under &amp;ldquo;${ZEPPELIN_HOME}/notebook&amp;rdquo;) and are lost the moment we shut the service down. In this second part, we create a GCE persistent disk to persistently store the Zeppelin notebooks.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,148 @@
+    <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="author" content="notiv.gr">
+		<meta name="description" content="Blog Description">
+		<meta name="generator" content="Hugo 0.29" />
+		<title>Git - Sparse Checkout &middot; notiv</title>
+		<link rel="shortcut icon" href="http://notiv.gr/images/favicon.ico">
+		<link rel="stylesheet" href="http://notiv.gr/css/style.css">
+		<link rel="stylesheet" href="http://notiv.gr/css/highlight.css">
+		
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/contrib/auto-render.min.js"></script>
+		
+		<link rel="stylesheet" href="http://notiv.gr/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://notiv.gr/index.xml" rel="alternate" type="application/rss+xml" title="notiv" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://notiv.gr/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://notiv.gr/post'>Archive</a>
+	<a href='http://notiv.gr/tags'>Tags</a>
+	<a href='http://notiv.gr/about'>About</a>
+
+	
+
+	
+	<a class="cta" href="http://notiv.gr/index.xml">Subscribe</a>
+	
+</nav>
+
+       <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Git - Sparse Checkout
+                    </h1>
+                    <h2 class="headline">
+                    Dec 30, 2015 00:00
+                    · 88 words
+                    · 1 minute read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://notiv.gr/tags/git">git</a>
+                          
+                              <a href="http://notiv.gr/tags/github">github</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>The other day I wanted to checkout only part of a github repository, to be more specific, the Spark example subfolder of the <a href="https://github.com/kubernetes/kubernetes">kubernetes github repository</a>: <a href="https://github.com/kubernetes/kubernetes/tree/master/examples/spark">tree/master/examples/spark</a>. I followed the instructions in this <a href="http://stackoverflow.com/questions/600079/is-there-any-way-to-clone-a-git-repositorys-sub-directory-only">Stackoverflow answer</a>:
+Create the folder where the repository code will be stored:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">git init
+</span><span style="">git remote add -f origin git://github.com/kubernetes/kubernetes.git</span></code></pre>
+</div>
+Set <em>core.sparseCheckout</em> to <em>true</em>:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">git config core.sparseCheckout true</span></code></pre>
+</div>
+and define which files should actually be checkout out:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">echo</span><span style=""> </span><span style="color:#e6db74">&#34;examples/spark&#34;</span><span style=""> &gt; .git/info/sparse-checkout</span></code></pre>
+</div>
+Finally update the (empty) repo with the state from the remote:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">git pull origin master</span></code></pre>
+</div></p>
+
+<p>Done!</p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+        <div id="social">
+
+	
+	
+    <a class="symbol" href="https://github.com/notiv">
+        <i class="fa fa-github-square"></i>
+    </a>
+    
+
+
+</div>
+
+    
+    <p class="small">
+    
+       © Copyright 2017 <i class="fa fa-heart" aria-hidden="true"></i> notiv.gr
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="http://notiv.gr/js/jquery-2.2.4.min.js"></script>
+<script src="http://notiv.gr/js/main.js"></script>
+<script src="http://notiv.gr/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17587753-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+        <script>renderMathInElement(document.body);</script>
+   </body>
+</html>

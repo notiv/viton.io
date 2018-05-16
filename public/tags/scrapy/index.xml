@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scrapy on notiv</title>
+    <link>http://notiv.gr/tags/scrapy/</link>
+    <description>Recent content in Scrapy on notiv</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 07 Sep 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://notiv.gr/tags/scrapy/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Pinscrapy</title>
+      <link>http://notiv.gr/post/2017-09-07-pinscrapy-a-crawler-that-scrapes-pinboard/</link>
+      <pubDate>Thu, 07 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2017-09-07-pinscrapy-a-crawler-that-scrapes-pinboard/</guid>
+      <description>For a while now I&amp;rsquo;ve been meaning to program a content recommender similar to the one described in this post by Dr. Bunsen. The idea is to parse the bookmarks of a Pinboard user and then use machine learning to recommend interesting content based on the bookmarks of other &amp;ldquo;similar&amp;rdquo; users.
+This post focuses on the first step, i.e. creating the data that will be fed to the machine learning algorithm by crawling a small part of Pinboard.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,251 @@
+    <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="author" content="notiv.gr">
+		<meta name="description" content="Blog Description">
+		<meta name="generator" content="Hugo 0.29" />
+		<title>Apache Spark Cluster with Kubernetes and Docker - Part 2 &middot; notiv</title>
+		<link rel="shortcut icon" href="http://notiv.gr/images/favicon.ico">
+		<link rel="stylesheet" href="http://notiv.gr/css/style.css">
+		<link rel="stylesheet" href="http://notiv.gr/css/highlight.css">
+		
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/contrib/auto-render.min.js"></script>
+		
+		<link rel="stylesheet" href="http://notiv.gr/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://notiv.gr/index.xml" rel="alternate" type="application/rss+xml" title="notiv" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://notiv.gr/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://notiv.gr/post'>Archive</a>
+	<a href='http://notiv.gr/tags'>Tags</a>
+	<a href='http://notiv.gr/about'>About</a>
+
+	
+
+	
+	<a class="cta" href="http://notiv.gr/index.xml">Subscribe</a>
+	
+</nav>
+
+       <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Apache Spark Cluster with Kubernetes and Docker - Part 2
+                    </h1>
+                    <h2 class="headline">
+                    Dec 30, 2015 00:00
+                    · 578 words
+                    · 3 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://notiv.gr/tags/apache">apache</a>
+                          
+                              <a href="http://notiv.gr/tags/spark">spark</a>
+                          
+                              <a href="http://notiv.gr/tags/docker">docker</a>
+                          
+                              <a href="http://notiv.gr/tags/kubernetes">kubernetes</a>
+                          
+                              <a href="http://notiv.gr/tags/zeppelin">zeppelin</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>In the <a href="http://notiv.gr/post/2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1/">first part of this tutorial</a>, we deployed a Spark Cluster on Google Compute Engine (GCE) and exposed a Zeppelin notebook service in order to provide access to the cluster and launch jobs via a notebook frontend.</p>
+
+<p>The problem with this configuration is that the notebooks are stored locally in the machine we create (specifically under &ldquo;${ZEPPELIN_HOME}/notebook&rdquo;) and are lost the moment we shut the service down. In this second part, we create a GCE persistent disk to persistently store the Zeppelin notebooks. This requires the creation of a new docker image for Zeppelin and a new yaml file for the Zeppelin controller.</p>
+
+<h3 id="before-we-begin">Before we begin</h3>
+
+<p>Let&rsquo;s assume that all steps described in <a href="http://notiv.gr/post/2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1/">Part 1</a> have been completed. To deploy the new Zeppelin service, we first have to delete the existing one:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl delete services zeppelin-controller
+</span><span style="">kubectl delete rc zeppelin-controller</span></code></pre>
+</div></p>
+
+<h3 id="create-a-gce-persistent-disk">Create a GCE persistent disk</h3>
+
+<p>Creating a persistent disk is a one-liner:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud compute disks create spark-disk --size 20GB</span></code></pre>
+</div>
+To get information about this disk run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud compute disks describe spark-disk</span></code></pre>
+</div></p>
+
+<h3 id="create-a-new-docker-image-for-zeppelin">Create a new docker image for Zeppelin</h3>
+
+<p>From the kubernetes repository download the following files:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">cd</span><span style=""> KubernetesSpark/examples/spark 
+</span><span style="">mkdir -p images/zeppelin
+</span><span style=""></span><span style="">cd</span><span style=""> images/zeppelin
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/images/zeppelin/Dockerfile
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/images/zeppelin/docker-zeppelin.sh
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/images/zeppelin/zeppelin-env.sh
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/images/zeppelin/zeppelin-log4j.properties</span></code></pre>
+</div></p>
+
+<p>In the Dockerfile change the spark-base version from <em>latest</em> to _1.5.1<em>v2</em>.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#FROM gcr.io/google_containers/spark-base:latest  # before
+</span><span style="color:#75715e"></span><span style="">FROM gcr.io/google_containers/spark-base:1.5.1_v2 # after</span></code></pre>
+</div>
+Then in the <em>zeppelin-env.sh</em> file modify the environment variable that defines where the Zeppelin notebooks are stored, e.g. export ZEPPELIN_NOTEBOOK_DIR=&ldquo;/pd/notebook&rdquo;.</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ZeppelinEnv.png" alt="Zeppelin Env Var" /></p>
+
+<p>Build the new image and tag it appropriately (replace <em>notiv</em> by another username):
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">docker build -t notiv/zeppelin:1.5.1_v2 .
+</span><span style="">docker tag notiv/zeppelin:1.5.1_v2 eu.gcr.io/project-spark-k8s-vv2/zeppelin:1.5.1_v2</span></code></pre>
+</div>
+Note that the Zeppelin image version (1.5.1_v2) should match the versions of the Spark images.</p>
+
+<p>Then upload the image to your registry (this can take a while, as the image is pretty big):
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud docker push eu.gcr.io/project-spark-k8s-vv2/zeppelin:1.5.1_v2</span></code></pre>
+</div></p>
+
+<h3 id="update-the-yaml-file">Update the yaml file</h3>
+
+<p>Now we modify the yaml file for the Zeppelin controller, so that a) it corresponds to the new docker image and b) the persistent disk we created is provisioned when we start the controller.</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ZeppelinControllerYaml.png" alt="Zeppelin Yaml" /></p>
+
+<p>In <a href="https://gist.github.com/notiv/23da1575acbf23780a21">this gist</a> you can find the code<sup class="footnote-ref" id="fnref:gist"><a rel="footnote" href="#fn:gist">1</a></sup>.</p>
+
+<h3 id="start-the-zeppelin-ui">Start the Zeppelin UI</h3>
+
+<p>Now we can start the Zeppelin service, as we did in <a href="{% post_url 2015-12-09-apache-spark-cluster-with-kubernetes-and-docker-part1 %}">Part 1</a>. Run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/zeppelin-controller.yaml</span></code></pre>
+</div>
+To check whether Zeppelin is running:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get pods -lcomponent</span><span style="color:#f92672">=</span><span style="">zeppelin</span></code></pre>
+</div>
+The output of this last command contains the name of the Zeppelin pod, e.g. zeppelin-controller-xyz12. To port-forward the Zeppelin port run the following command:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl port-forward zeppelin-controller-xyz12 </span><span style="color:#ae81ff">8080</span><span style="">:8080</span></code></pre>
+</div>
+Zeppelin can now be found at <a href="http://localhost:8080">http://localhost:8080</a>:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ZeppelinInit.png" alt="Zeppelin Initial Screen" /></p>
+
+<p>To access the notebook externally, the service should be exposed:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl expose rc zeppelin-controller --type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;LoadBalancer&#34;</span></code></pre>
+</div></p>
+
+<p>Run the following command to find the external IP:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get services zeppelin-controller</span></code></pre>
+</div></p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ExternalIP.png" alt="ExternalIP" /></p>
+
+<p>That means that Zeppelin can also be found at <a href="http://104.155.67.27:8080">http://104.155.67.27:8080</a><sup class="footnote-ref" id="fnref:security"><a rel="footnote" href="#fn:security">2</a></sup></p>
+
+<h3 id="final-note">Final note</h3>
+
+<p>After setting up the cluster, the next thing I did, was to upload a dataset to play with. Here&rsquo;s the process.</p>
+
+<p>First, make sure you have <em>gsutil</em> installed<sup class="footnote-ref" id="fnref:gsutilSDK"><a rel="footnote" href="#fn:gsutilSDK">3</a></sup>. If this is not the case, follow the instructions <a href="https://cloud.google.com/storage/docs/gsutil_install">here</a>. Then create a bucket with a unique name:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gsutil mb -c nearline -l europe-west1 -p project-spark-k8s-vv2 gs://notiv-spark-bucket</span></code></pre>
+</div>
+To upload a file (e.g. ~/linkage.csv) run the following command:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gsutil cp ~/linkage.csv gs://notiv-spark-bucket/data/linkage/linkage.csv</span></code></pre>
+</div>
+and to access the file in the Zeppelin notebook:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">val </span><span style="">linkage</span><span style=""> </span><span style="color:#f92672">=</span><span style=""> sc.textFile</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;gs://notiv-spark-bucket/data/linkage/linkage.csv&#34;</span><span style="color:#f92672">)</span></code></pre>
+</div></p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:gist">Don&rsquo;t forget to change the ProjectID when you define the image.
+ <a class="footnote-return" href="#fnref:gist"><sup>[return]</sup></a></li>
+<li id="fn:security"><strong>Important</strong>: As noted in the previous post, everyone with this IP address has access to this notebook!
+ <a class="footnote-return" href="#fnref:security"><sup>[return]</sup></a></li>
+<li id="fn:gsutilSDK">If you installed the <a href="https://cloud.google.com/sdk">Google Cloud SDK</a>, then gsutil is already installed.
+ <a class="footnote-return" href="#fnref:gsutilSDK"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+        <div id="social">
+
+	
+	
+    <a class="symbol" href="https://github.com/notiv">
+        <i class="fa fa-github-square"></i>
+    </a>
+    
+
+
+</div>
+
+    
+    <p class="small">
+    
+       © Copyright 2017 <i class="fa fa-heart" aria-hidden="true"></i> notiv.gr
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="http://notiv.gr/js/jquery-2.2.4.min.js"></script>
+<script src="http://notiv.gr/js/main.js"></script>
+<script src="http://notiv.gr/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17587753-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+        <script>renderMathInElement(document.body);</script>
+   </body>
+</html>

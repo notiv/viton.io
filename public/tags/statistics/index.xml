@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Statistics on notiv</title>
+    <link>http://notiv.gr/tags/statistics/</link>
+    <description>Recent content in Statistics on notiv</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 12 Mar 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://notiv.gr/tags/statistics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Calculate the variance of a sample from the variances of its subsamples</title>
+      <link>http://notiv.gr/post/2016-03-12-calculate-variance-from-subsample-variances/</link>
+      <pubDate>Sat, 12 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://notiv.gr/post/2016-03-12-calculate-variance-from-subsample-variances/</guid>
+      <description>Calculating the mean of a sample from the means of its subsamples is pretty straightforward1.
+Calculating however the variance of a sample from the variances of its subsamples didn&#39;t seem straightforward to me. It looks like there is a formula that allows us to do that. Assuming we have \(g\) sub-samples, each with \(k_j\), \(j=1,...,g\) elements for a total of \(n=\sum k_j\) values, then:
+\[ Var(X_1,...,X_n) = \frac{1}{n-1}(\sum_{j=1}^{g} (k_j-1)Var_j + \sum_{j=1}^{g}k_j(\bar{X}_j-\bar{X})^2) \]</description>
+    </item>
+    
+  </channel>
+</rss>

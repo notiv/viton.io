@@ -1,0 +1,304 @@
+    <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="author" content="notiv.gr">
+		<meta name="description" content="Blog Description">
+		<meta name="generator" content="Hugo 0.29" />
+		<title>Apache Spark Cluster with Kubernetes and Docker - Part 1 &middot; notiv</title>
+		<link rel="shortcut icon" href="http://notiv.gr/images/favicon.ico">
+		<link rel="stylesheet" href="http://notiv.gr/css/style.css">
+		<link rel="stylesheet" href="http://notiv.gr/css/highlight.css">
+		
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/contrib/auto-render.min.js"></script>
+		
+		<link rel="stylesheet" href="http://notiv.gr/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://notiv.gr/index.xml" rel="alternate" type="application/rss+xml" title="notiv" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://notiv.gr/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://notiv.gr/post'>Archive</a>
+	<a href='http://notiv.gr/tags'>Tags</a>
+	<a href='http://notiv.gr/about'>About</a>
+
+	
+
+	
+	<a class="cta" href="http://notiv.gr/index.xml">Subscribe</a>
+	
+</nav>
+
+       <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Apache Spark Cluster with Kubernetes and Docker - Part 1
+                    </h1>
+                    <h2 class="headline">
+                    Dec 9, 2015 00:00
+                    · 772 words
+                    · 4 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://notiv.gr/tags/apache">apache</a>
+                          
+                              <a href="http://notiv.gr/tags/spark">spark</a>
+                          
+                              <a href="http://notiv.gr/tags/docker">docker</a>
+                          
+                              <a href="http://notiv.gr/tags/kubernetes">kubernetes</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>If you&rsquo;re into Data Science and Analytics, you&rsquo;ve probably heard of <a href="http://spark.apache.org">Apache Spark</a>. I&rsquo;ve been playing with this framework on and off for a while and completed two very interesting <a href="http://www.edx.org/course/introduction-big-data-apache-spark-uc-berkeleyx-cs100-1x">MOOCs</a> on Spark; recently I decided</p>
+
+<h3 id="first-things-first">First things first</h3>
+
+<p>Click <a href="https://cloud.google.com/container-engine/docs/before-you-begin">this link</a> and follow the instructions in the section &ldquo;Before you begin&rdquo;: Create a google account, enable billing<sup class="footnote-ref" id="fnref:billing"><a rel="footnote" href="#fn:billing">1</a></sup>, install the gcloud command line interface (CLI) and install docker locally. <em>kubectl</em> should also be installed:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud components update kubectl</span></code></pre>
+</div></p>
+
+<p>As a second step, create a new project in the <a href="http://console.developers.google.com/">Google Developers Console</a>, give it an appropriate name (e.g. project-spark-k8s),</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_CreateNewProject_1.png" alt="Create New Project -1" /></p>
+
+<p>if necessary, assign a unique ProjectID<sup class="footnote-ref" id="fnref:uniquePID"><a rel="footnote" href="#fn:uniquePID">2</a></sup></p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_CreateNewProject_2.png" alt="Create New Project - 2" /></p>
+
+<p>and set this project as default using the CLI:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud config </span><span style="">set</span><span style=""> project </span><span style="color:#e6db74">&#34;project-spark-k8s-vv2&#34;</span></code></pre>
+</div></p>
+
+<p>Then go again to the <a href="https://cloud.google.com/container-engine/docs/before-you-begin">Before you begin</a> link and enable the Google Container and Google Compute Engine APIs:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_EnableContainerAPI.png" alt="Enable Container API" /></p>
+
+<p>Finally create a local folder where you&rsquo;ll work:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">mkdir -p KubernetesSpark/examples/spark</span></code></pre>
+</div></p>
+
+<p>and download the following files in it:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">cd</span><span style=""> KubernetesSpark/examples/spark
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/spark-master-controller.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/spark-master-controller.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/spark-master-service.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/spark-webui.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/spark-worker-controller.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/zeppelin-controller.yaml
+</span><span style="">curl -O https://raw.githubusercontent.com/kubernetes/kubernetes/v1.2.0-alpha.5/examples/spark/zeppelin-service.yaml</span></code></pre>
+</div></p>
+
+<h3 id="create-a-cluster">Create a cluster</h3>
+
+<p>To create a cluster run the following command:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud container --project </span><span style="color:#e6db74">&#34;project-spark-k8s&#34;</span><span style=""> clusters create spark-cluster --num-nodes </span><span style="color:#ae81ff">4</span><span style=""> --zone europe-west1-c --machine-type n1-standard-1 --scope </span><span style="color:#e6db74">&#34;https://www.googleapis.com/auth/compute&#34;</span></code></pre>
+</div></p>
+
+<p>As you can see, the cluster created, named &ldquo;spark-cluster&rdquo;, consists of four <em>n1-standard-1</em> nodes. To get more information about it, type:
+To check the names of the four instances and get basic information about them (e.g. internal IP, external IP, etc), type:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">gcloud compute instances list</span></code></pre>
+</div></p>
+
+<h3 id="start-master-service">Start Master Service</h3>
+
+<p>NOTE: This documentation is heavily based on <a href="https://github.com/kubernetes/kubernetes/tree/master/examples/spark">https://github.com/kubernetes/kubernetes/tree/master/examples/spark</a>.</p>
+
+<p>First create a replication controller running the Spark Master service:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/spark-master-controller.yaml</span></code></pre>
+</div></p>
+
+<p>To find out details about the replication controller, first find its exact name:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get pods</span></code></pre>
+</div>
+This command returns something like this:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">NAME                            READY     STATUS    RESTARTS   AGE
+</span><span style="">spark-master-controller-xyz12   </span><span style="color:#ae81ff">1</span><span style="">/1       Running   </span><span style="color:#ae81ff">0</span><span style="">          1h</span></code></pre>
+</div>
+Then run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl describe pods spark-master-controller-xyz12</span></code></pre>
+</div>
+which returns information about the image, node, label etc. To check the log of the service, run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl logs spark-master-controller-xyz12</span></code></pre>
+</div></p>
+
+<p>Here a sample of the log output:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_MasterControllerLogs1.png" alt="Master Controller Logs" /></p>
+
+<p>As a second step after the creation of the replication controller, create a <strong>logical</strong> service endpoint that Spark workers can use to access the Master pod:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/spark-master-service.yaml</span></code></pre>
+</div>
+and then create a service for the Spark Master WebUI:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/spark-webui.yaml</span></code></pre>
+</div>
+To get basic information about the running services, run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get services</span></code></pre>
+</div></p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_GetServices.png" alt="Get Services" /></p>
+
+<p>For more detailed information about each service, run the corresponding <em>describe</em> command, e.g.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl describe service spark-master</span></code></pre>
+</div>
+To connect to the Spark WebUI, use the cluster proxy:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl proxy --port</span><span style="color:#f92672">=</span><span style="color:#ae81ff">8001</span></code></pre>
+</div>
+at which point the UI is available at: <a href="http://localhost:8001/api/v1/proxy/namespaces/default/services/spark-webui/">http://localhost:8001/api/v1/proxy/namespaces/default/services/spark-webui/</a>.</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_WebUIInit.png" alt="WebUI Init" /></p>
+
+<p>To make sure the command line is accessible press <em>Ctrl-Z</em> and then type <em>bg</em>. This way the process can run in the background, while other commands can be run in the foreground.</p>
+
+<h3 id="start-the-spark-workers">Start the Spark Workers</h3>
+
+<p>NOTE: The Spark workers need the Master service to be running.</p>
+
+<p>First create a replication controller that manages the worker pods:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/spark-worker-controller.yaml</span></code></pre>
+</div>
+To see that the workers are running, type again:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get pods</span></code></pre>
+</div>
+The output now contains not only the spark-master-controller pod, but also the spark-worker-controllers. To check the logs run again:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl logs spark-master-controller-xyz12</span></code></pre>
+</div>
+in which case the output looks like that:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_MasterControllerLogs2.png" alt="Master Controller Logs" /></p>
+
+<p>The WebUI now looks like that:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_WebUI.png" alt="Image of WebUI" /></p>
+
+<h3 id="start-the-zeppelin-ui">Start the Zeppelin UI</h3>
+
+<p>The Zeppelin UI pod will be used to launch jobs into the Spark cluster. To start it, run:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl create -f examples/spark/zeppelin-controller.yaml</span></code></pre>
+</div>
+To check whether Zeppelin is running:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get pods -lcomponent</span><span style="color:#f92672">=</span><span style="">zeppelin</span></code></pre>
+</div>
+The output of this last command contains the name of the Zeppelin pod, e.g. zeppelin-controller-xyz12. To port-forward the Zeppelin port run the following command:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl port-forward zeppelin-controller-xyz12 </span><span style="color:#ae81ff">8080</span><span style="">:8080</span></code></pre>
+</div>
+Zeppelin can now be found at <a href="http://localhost:8080">http://localhost:8080</a>:</p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ZeppelinInit.png" alt="Zeppelin Initial Screen" /></p>
+
+<p>As noted in <a href="https://github.com/kubernetes/kubernetes/tree/master/examples/spark">https://github.com/kubernetes/kubernetes/tree/master/examples/spark</a> &ldquo;On GKE, kubectl port-forward may not be stable over long periods of time. If you see Zeppelin go into Disconnected state (there will be a red dot on the top right as well), the port-forward probably failed and needs to be restarted.&rdquo;</p>
+
+<p>To access the notebook externally, the service should be exposed:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl expose rc zeppelin-controller --type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;LoadBalancer&#34;</span></code></pre>
+</div></p>
+
+<p>Run the following command to find the external IP:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="">kubectl get services zeppelin-controller</span></code></pre>
+</div></p>
+
+<p><img src="/img/screenshots/KubernetesSpark/Screenshot_ExternalIP.png" alt="ExternalIP" /></p>
+
+<p>That means that Zeppelin can also be found at <a href="http://104.155.67.27:8080">http://104.155.67.27:8080</a><sup class="footnote-ref" id="fnref:security"><a rel="footnote" href="#fn:security">3</a></sup></p>
+
+<p>In the <a href="http://notiv.gr/post/2016-02-01-apache-spark-cluster-with-kubernetes-and-docker-part2/">next part of this tutorial</a>, we&rsquo;ll create a GCE persistent disk to persistently store the Zeppelin notebooks we create in this cluster. This requires the creation of a new docker image for Zeppelin and a new yaml file for the Zeppelin controller.</p>
+
+<p>For now, enjoy!</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:billing">The first $300 are on Google.
+ <a class="footnote-return" href="#fnref:billing"><sup>[return]</sup></a></li>
+<li id="fn:uniquePID">Note that the ProjectID is a globally unique identifier.
+ <a class="footnote-return" href="#fnref:uniquePID"><sup>[return]</sup></a></li>
+<li id="fn:security"><strong>Important</strong>: Note that everyone with this IP address has access to this notebook!
+ <a class="footnote-return" href="#fnref:security"><sup>[return]</sup></a></li>
+</ol>
+</div>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+        <div id="social">
+
+	
+	
+    <a class="symbol" href="https://github.com/notiv">
+        <i class="fa fa-github-square"></i>
+    </a>
+    
+
+
+</div>
+
+    
+    <p class="small">
+    
+       © Copyright 2017 <i class="fa fa-heart" aria-hidden="true"></i> notiv.gr
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="http://notiv.gr/js/jquery-2.2.4.min.js"></script>
+<script src="http://notiv.gr/js/main.js"></script>
+<script src="http://notiv.gr/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17587753-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+        <script>renderMathInElement(document.body);</script>
+   </body>
+</html>

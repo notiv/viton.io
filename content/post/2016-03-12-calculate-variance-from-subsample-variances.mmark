@@ -1,0 +1,29 @@
++++
+author = "Viton Vitanis"
+date = "2016-03-12"
+linktitle = "Calculate the variance of a sample from the variances of its subsamples"
+title = "Calculate the variance of a sample from the variances of its subsamples"
+description = "Variance calculation from the variance of subsamples"
+tags = [
+  "statistics",
+  "variance",
+  "notes"
+]
+categories = [
+  "statistics"
+]
+weight = 10
++++
+Calculating the mean of a sample from the means of its subsamples is pretty straightforward[^means]. 
+
+Calculating however the variance of a sample from the variances of its subsamples didn't seem straightforward to me. It looks like [there is a formula](http://stats.stackexchange.com/questions/10441/how-to-calculate-the-variance-of-a-partition-of-variables) that allows us to do that. Assuming we have $$g$$ sub-samples, each with $$k_j$$, $$j=1,...,g$$ elements for a total of $$n=\sum k_j$$ values, then:
+
+$$ 
+Var(X_1,...,X_n) = \frac{1}{n-1}(\sum_{j=1}^{g} (k_j-1)Var_j + \sum_{j=1}^{g}k_j(\bar{X}_j-\bar{X})^2)
+$$ 
+
+$$Var$$ being the variance, and $$\bar{X}_{j}$$ the mean of the sample $$j$$.
+
+[This wikipedia article](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance) describes various algorithms to calculate variance in a number of scenarios (e.g. online, in parallel, etc), whereas [this paper](http://people.xiph.org/~tterribe/tmp/homs/West79-_Updating_Mean_and_Variance_Estimates-_An_Improved_Method.pdf) presents some computational considerations when updating mean and variance estimates. 
+
+[^means]: Provided of course that we have the sizes of all subsamples
